@@ -8,7 +8,8 @@ opencv_apps::BlobArrayStamped new_blobs_msg;
 geometry_msgs::Twist robot_vel;
 
 int frame_width = 640;
-float angular_speed_z = 1.5;
+float angular_speed_z = 0.5;
+bool new_blobs_msg_available = false;
 
 void rotateAroundZ(float angular_speed_z)
 {
@@ -16,6 +17,7 @@ void rotateAroundZ(float angular_speed_z)
         robot_vel.linear.y = 0;
         robot_vel.angular.z = angular_speed_z;
         velocity_pub.publish(robot_vel);
+        ros::Duration(1).sleep();
 }
 
 void stop()
@@ -29,6 +31,7 @@ void stop()
 
 void getBlobs(opencv_apps::BlobArrayStamped blobs_msg)
 {
+   new_blobs_msg_available = true;
    new_blobs_msg = blobs_msg;
 }
 
@@ -38,17 +41,34 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "blob_detection_demo_node");
   ros::NodeHandle nh;
   velocity_pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+  //velocity_pub = nh.advertise<geometry_msgs::Twist>("robotont/cmd_vel", 1);
   blobs_sub = nh.subscribe("blob_detection/blobs", 1000, getBlobs);
 
-  if (new_blobs_msg.blobs[0].center.x < frame_width/2)
+  while (ros::ok())
   {
-    stop();
-    ros::Duration(1).sleep();
-  }
+    ROS_INFO("test if the node is working.");
+  //if (new_blobs_msg_available)
+  //{
+    //new_blobs_msg_available = false;
+    //if (new_blobs_msg.blobs.size() > 0)
+    //{
+     // if (new_blobs_msg.blobs[0].center.x < frame_width/2)
+      //{
+       // stop();
+       // ros::Duration(1).sleep();
+      //}
 
-  else
-  {
-    rotateAroundZ(angular_speed_z);
+      //else
+      //{
+        //rotateAroundZ(angular_speed_z);
+      //}
+    //}
+  //}
+  
+        robot_vel.linear.x = 0;
+        robot_vel.linear.y = 0;
+        robot_vel.angular.z = angular_speed_z;
+        velocity_pub.publish(robot_vel);
   }
 
 
@@ -72,7 +92,8 @@ int main(int argc, char **argv)
 //     radius: 420.648895264
 // ---
 
-  ros::spin();
+  
+  //ros::spin();
 
   return 0;
 }
