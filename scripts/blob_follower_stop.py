@@ -9,9 +9,10 @@ import cv_bridge
 import numpy as np
 
 new_blob_available = False
+state_tracking_blob = True
 
-x_coord = 400
-size = 170 
+x_coord = 320
+size = 170
 
 
 
@@ -23,42 +24,44 @@ def get_blob(blob_position):
         size = blob_position.blobs[0].radius
 
 def main():
-    global new_blob_available, x_coord, size, robot_vel, velocity_pub
+    global new_blob_available, x_coord, size, robot_vel, velocity_pub, state_tracking_blob
 
     rospy.init_node("blob_follower")
     rospy.Subscriber("blob_detection/blobs", BlobArrayStamped, get_blob)
    
     velocity_pub = rospy.Publisher("mobile_base_controller/cmd_vel", Twist, queue_size=1)
-    loop_rate = rospy.Rate(30)
+    #loop_rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
 
-        
-        if new_blob_available :
+        if state_tracking_blob :
             robot_vel = Twist()
-            if x_coord < 400 :
+            robot_vel.angular.z = 0.15
+            velocity_pub.publish(robot_vel)
+
+        if new_blob_available :
+            state_tracking_blob = False
+            robot_vel = Twist()
+            if x_coord < 320 :
                 robot_vel.angular.z = 0.15
-            elif x_coord > 400 :
+            elif x_coord > 320 :
                 robot_vel.angular.z = -0.15
             else:
                 robot_vel.angular.z = 0.0
 
             if size < 170:
-                robot_vel.linear.x = 0.3
+                robot_vel.linear.x = 0.1
             elif size > 170:
-                robot_vel.linear.x = -0.3
+                robot_vel.linear.x = -0.1
             else:
                 robot_vel.linear.x = 0.0
 
             velocity_pub.publish(robot_vel)
 
             new_blob_available = False
-        else :
-            robot_vel = Twist()
-            robot_vel.angular.z = 0.15
-            velocity_pub.publish(robot_vel)
+
         
-        loop_rate.sleep()
+        #loop_rate.sleep()
 
 if __name__ == '__main__':
     main()
