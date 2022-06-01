@@ -207,9 +207,3 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
-
-add_executable(blob_detection_demo_node src/blob_detection_demo_node.cpp)
-target_link_libraries(blob_detection_demo_node ${catkin_LIBRARIES})
-
-add_executable(trajectory_commander_node src/trajectory_commander_node.cpp)
-target_link_libraries(trajectory_commander_node ${catkin_LIBRARIES})
