@@ -4,7 +4,8 @@ Blob Detection Demo:
 
 Running Steps:
 
-NB: Replace "YourTopic" in the following command to the actual image topic.
+NB: Checkout the blob_detection_nodelet branch of opencv_apps.
+Replace "YourTopic" in the following command to the actual image topic.
 
 Find Shape:
 
